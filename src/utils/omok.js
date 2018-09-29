@@ -1,18 +1,18 @@
-export const getRowIndex = (index, size) => (index - index % size) / size
+export const getRowIndex = (index, size) => (index - (index % size)) / size
 
 export const getColumnIndex = (index, size) => {
-  const row = (index - index % size) / size
+  const row = (index - (index % size)) / size
   return index - row * size
 }
 
 export const mapVertical = ({ goBoard, size, targetColumnIndex }) => {
-  return goBoard.filter((x, i) => {
+  return goBoard.filter((_, i) => {
     return getColumnIndex(i, size) === targetColumnIndex
   })
 }
 
 export const mapHorizontal = ({ goBoard, size, targetRowIndex }) => {
-  return goBoard.filter((x, i) => {
+  return goBoard.filter((_, i) => {
     return getRowIndex(i, size) === targetRowIndex
   })
 }
@@ -24,14 +24,19 @@ export const mapIncrementDiagonal = ({ goBoard, size, cellIndex }) => {
   let mappedArray = []
   if (col > row) {
     const diff = col - row
-    for (let i = 0; i < diff + 1; i++) {
-      const targetIndex = size * i + (i + diff)
+    for (let i = 0; i < size - diff; i++) {
+      const targetIndex = diff + i * (size + 1)
       mappedArray.push(goBoard[targetIndex])
     }
   } else if (col < row) {
     const diff = row - col
-    for (let i = 0; i < diff + 1; i++) {
-      const targetIndex = size * (i + diff) + i
+    for (let i = 0; i < size - diff; i++) {
+      const targetIndex = size * diff + i * (size + 1)
+      mappedArray.push(goBoard[targetIndex])
+    }
+  } else if (col === row) {
+    for (let i = 0; i < size; i++) {
+      const targetIndex = i * (size + 1)
       mappedArray.push(goBoard[targetIndex])
     }
   }
@@ -52,11 +57,14 @@ export const mapDecrementDiagonal = ({ goBoard, size, cellIndex }) => {
 }
 
 export const calcuateWithMap = (mapped, endCondition) => {
-  let stoneState = 'black'
+  let checkOccupied = mapped.find(({ occupied }) => occupied !== null)
+  if (!checkOccupied) return null
+  let stoneState = checkOccupied.occupied
   let winner = null
-  const score = mapped.reduce((continuous, { occupied }) => {
+  mapped.reduce((continuous, { occupied }) => {
     if (occupied === stoneState) {
       const nextContinousCount = continuous + 1
+      console.log('continuous count', nextContinousCount)
       if (nextContinousCount === endCondition) {
         winner = stoneState
       }

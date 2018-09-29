@@ -1,4 +1,4 @@
-import React, { Component, version } from 'react'
+import React, { Component } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import {
@@ -23,7 +23,7 @@ class App extends Component {
   componentDidMount() {
     this.setState(prevState => ({
       ...prevState,
-      goBoard: this.goBoardGenerator(16),
+      goBoard: this.goBoardGenerator(prevState.size),
     }))
   }
 
@@ -83,8 +83,10 @@ class App extends Component {
     const winner =
       calcuateWithMap(verticalMapped, e) ||
       calcuateWithMap(horizontalMapped, e) ||
+      calcuateWithMap(decDiagonalMapped, e) ||
+      calcuateWithMap(incDiagonalMapped, e) ||
       null
-    // console.log('winner is ', winner)
+    console.log('winner is ', winner)
   }
 
   goBoardGenerator = size => {
